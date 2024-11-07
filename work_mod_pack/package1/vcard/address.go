@@ -18,9 +18,9 @@ var addresses []Address
 //example2: Huangshi Rd Baiyun district No.1313
 
 func Address_input(strs []string) {
-	patdis := "([a-zA-Z]+)/s+district/s+"
-	patstr := "([a-zA-Z]+)/s+(Aven|Rd)+"
-	patno := "No/.+(/d+)"
+	patdis := "([a-zA-Z]+)\\s+district\\s+"
+	patstr := "([a-zA-Z]+)\\s+(Aven|Rd)+"
+	patno := "No\\.+(\\d+)"
 
 	redis, _ := regexp.Compile(patdis)
 	restr, _ := regexp.Compile(patstr)

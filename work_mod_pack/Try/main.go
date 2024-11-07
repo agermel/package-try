@@ -1,6 +1,6 @@
 package main
 
-import "package1/vcard"
+import "work_mod_pack/package1/vcard"
 
 func main() {
 	inputs := []string{

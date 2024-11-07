@@ -1,6 +1,6 @@
 go 1.23.2
 
 use (
-	./Try
-	./package1
+	../work_mod_pack/Try
+	../work_mod_pack/package1
 )
