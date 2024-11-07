@@ -1,16 +1,12 @@
 package main
 
-import (
-	"package1/examine"
-	"package1/greetings"
-)
+import "package1/vcard"
 
 func main() {
-	a := "morning"
-	if greetings.ISmorning(a) {
-		greetings.Morning()
+	inputs := []string{
+		"Baiyun district Sanyuanli Aven No.1",
+		"Huangshi Rd Baiyun district No.1313",
 	}
-	for i := 0; i <= 50; i++ {
-		examine.Oddeven(i)
-	}
+	vcard.Address_input(inputs)
+	vcard.Address_output()
 }
