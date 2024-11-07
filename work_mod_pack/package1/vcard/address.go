@@ -6,6 +6,11 @@ import (
 	"strconv"
 )
 
+type Vcard struct {
+	name    string
+	Address *Address
+}
+
 type Address struct {
 	street  string
 	number  int
@@ -13,6 +18,7 @@ type Address struct {
 }
 
 var addresses []Address
+var vcards []Vcard
 
 //example1: Baiyun district Sanyuanli Aven No.1
 //example2: Huangshi Rd Baiyun district No.1313
@@ -46,5 +52,23 @@ func Address_output() {
 	for _, address := range addresses {
 		fmt.Printf("District:%s Street:%s No:%d \n",
 			address.distric, address.street, address.number)
+	}
+}
+
+func Vcard_input(names []string) {
+	for i, address := range addresses {
+		vcard := Vcard{
+			name:    names[i],
+			Address: &address,
+		}
+		vcards = append(vcards, vcard)
+	}
+}
+
+func Vcard_output() {
+	for _, vcard := range vcards {
+		fmt.Printf("Name:%s ", vcard.name)
+		fmt.Printf("District:%s Street:%s No:%d \n",
+			vcard.Address.distric, vcard.Address.street, vcard.Address.number)
 	}
 }

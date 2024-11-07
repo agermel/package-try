@@ -7,6 +7,11 @@ func main() {
 		"Baiyun district Sanyuanli Aven No.1",
 		"Huangshi Rd Baiyun district No.1313",
 	}
+	inputs_n := []string{
+		"Kent",
+		"Joden",
+	}
 	vcard.Address_input(inputs)
-	vcard.Address_output()
+	vcard.Vcard_input(inputs_n)
+	vcard.Vcard_output()
 }
