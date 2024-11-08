@@ -23,4 +23,5 @@ func main() {
 
 	rec1 := rectangle.Rectangle{Width: 1, Length: 2}
 	fmt.Println(rectangle.Area(rec1), rectangle.Perimeter(rec1))
+
 }
