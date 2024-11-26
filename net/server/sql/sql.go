@@ -10,45 +10,50 @@ import (
 )
 
 var (
-	users       = make(map[string]*User) // 存储所有用户信息
-	sessions    = make(map[string]string) // 存储会话信息，模拟登录状态
-	mu          sync.Mutex               // 防止并发读写冲突
-	sessionLife = time.Minute * 30        // Session 超时设置
+	users       = make(map[string]*User)  // 存储所有用户信息
+	sessions    = make(map[string]string) // 存储会话信息
+	mu          sync.Mutex
+	sessionLife = time.Minute * 30
 )
 
-// User 结构体定义用户信息
+// 用户信息
 type User struct {
 	Username string `json:"username"`
 	Nickname string `json:"nickname"`
 	Password string `json:"password"`
 }
 
-// UserInfoResponse 用于返回用户信息
+// 返回用户信息
 type UserInfoResponse struct {
 	Username string `json:"username"`
 	Nickname string `json:"nickname"`
 }
 
-// helper function to get session user from cookie or token
+// 从cookie返回用户
 func getSessionUser(r *http.Request) *User {
-	sessionToken := r.Header.Get("Authorization")
-	if sessionToken == "" {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
 		return nil
 	}
+	sessionToken := cookie.Value
+
 	mu.Lock()
 	defer mu.Unlock()
+
 	username, exists := sessions[sessionToken]
 	if !exists {
 		return nil
 	}
+
 	user, exists := users[username]
 	if !exists {
 		return nil
 	}
+
 	return user
 }
 
-// Register 用户注册
+// 注册
 func Register(w http.ResponseWriter, r *http.Request) {
 	var user User
 	decoder := json.NewDecoder(r.Body)
@@ -66,13 +71,12 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Store user
 	users[user.Username] = &user
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprintf(w, "User %s registered successfully", user.Username)
 }
 
-// Login 用户登录，生成 session token
+// 登录,生成 session token
 func Login(w http.ResponseWriter, r *http.Request) {
 	var user User
 	decoder := json.NewDecoder(r.Body)
@@ -91,8 +95,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create session (simple token mechanism)
-	sessionToken := fmt.Sprintf("%d", time.Now().UnixNano()) // Generate a simple session token
+	sessionToken := fmt.Sprintf("%d", time.Now().UnixNano()) //
 	sessions[sessionToken] = user.Username
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
@@ -104,13 +107,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Logged in successfully")
 }
 
-// Logout 用户登出，删除 session
+// 登出,删除 session
 func Logout(w http.ResponseWriter, r *http.Request) {
-	sessionToken := r.Header.Get("Authorization")
-	if sessionToken == "" {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
 		http.Error(w, "Not authenticated", http.StatusUnauthorized)
 		return
 	}
+
+	sessionToken := cookie.Value
 
 	mu.Lock()
 	defer mu.Unlock()
@@ -126,7 +131,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Logged out successfully")
 }
 
-// ChangePassword 修改密码
+// 修改密码
 func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	user := getSessionUser(r)
 	if user == nil {
@@ -155,7 +160,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Password changed successfully")
 }
 
-// GetUserInfo 获取用户信息
+// 获取用户信息
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	user := getSessionUser(r)
 	if user == nil {
@@ -172,7 +177,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// UpdateUserInfo 修改用户信息
+// 修改用户信息
 func UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	user := getSessionUser(r)
 	if user == nil {

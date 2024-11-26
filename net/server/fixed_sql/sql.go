@@ -213,6 +213,6 @@ func main() {
 	http.HandleFunc("/user-info", GetUserInfo)
 	http.HandleFunc("/update-info", UpdateUserInfo)
 
-	log.Println("Starting server on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Starting server on :9090")
+	log.Fatal(http.ListenAndServe(":9090", nil))
 }
