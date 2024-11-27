@@ -187,8 +187,8 @@ func main() {
 	// real_url http://kjyy.ccnu.edu.cn/ClientWeb/pro/ajax/device.aspx?byType=devcls&classkind=8&display=fp&md=d&room_id=101699187&purpose=&selectOpenAty=&cld_name=default&date=2024-11-26&fr_start=14%3A50&fr_end=17%3A50&act=get_rsv_sta&_=1732603671177
 
 	params := "?byType=devcls&classkind=8&display=fp&md=d&room_id=" + room_id + "&purpose=&selectOpenAty=&cld_name=default&date=" + formattedDate +
-		"&fr_start=19%3A50&fr_end=20%3A50&act=get_rsv_sta&_=" + fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
-	//并没有在外部设定一个时间设定器
+		"&fr_start=" + startTime_coded_url + "&fr_end=" + overTime_coded_url + "&act=get_rsv_sta&_=" +
+		fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
 
 	//查询过程
 	reqSit, err := http.NewRequest("GET", sitUrl+params, nil)
@@ -197,13 +197,14 @@ func main() {
 		return
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
-	req.Header.Set("Accept-Encoding", "gzip, deflate")
-	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9")
-	req.Header.Set("Referer", "http://kjyy.ccnu.edu.cn/clientweb/xcus/ic2/Default.aspx")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
-	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	//	req.Header.Set("Content-Type", "application/json")
+	//	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
+	//	req.Header.Set("Accept-Encoding", "gzip, deflate")
+	//	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9")
+	//	req.Header.Set("Referer", "http://kjyy.ccnu.edu.cn/clientweb/xcus/ic2/Default.aspx")
+	//	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+	//	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	//这里似乎没啥必要: client已经将请求头给塞进去
 
 	respSit, err := client.Do(reqSit)
 	if err != nil {
@@ -274,7 +275,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
+	defer respRese.Body.Close()
 
 	bodyRese, err := ioutil.ReadAll(respRese.Body)
 	if err != nil {
