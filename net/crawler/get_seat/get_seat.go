@@ -131,6 +131,7 @@ func main() {
 		return
 	}
 	defer respPost.Body.Close()
+	fmt.Printf("%+v\n", respPost.Body)
 
 	//至此登录过程结束
 	sitUrl := "http://kjyy.ccnu.edu.cn/ClientWeb/pro/ajax/device.aspx"
@@ -198,7 +199,7 @@ func main() {
 	}
 
 	//	req.Header.Set("Content-Type", "application/json")
-	//	req.Header.Set("Accept", "application/json, text/javascript, */*; q=0.01")
+	//	req.Header.Set("Accept", "application/json, text/javascript, */ /*; q=0.01")
 	//	req.Header.Set("Accept-Encoding", "gzip, deflate")
 	//	req.Header.Set("Accept-Language", "zh-CN,zh;q=0.9")
 	//	req.Header.Set("Referer", "http://kjyy.ccnu.edu.cn/clientweb/xcus/ic2/Default.aspx")

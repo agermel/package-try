@@ -9,9 +9,10 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
-// 登陆吧少年
 func Login(username, password string) (*http.Client, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
@@ -93,6 +94,17 @@ func Login(username, password string) (*http.Client, error) {
 		return client, err
 	}
 	defer respPost.Body.Close()
+
+	bodyPost, _ := ioutil.ReadAll(respPost.Body)
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(bodyPost)))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	msg := doc.Find("#msg").Text()
+	if msg == "您输入的用户名或密码有误。" {
+		return client, fmt.Errorf("%s", "您输入的用户名或密码有误")
+	}
 
 	return client, err
 }
