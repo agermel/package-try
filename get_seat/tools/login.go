@@ -63,8 +63,8 @@ func Login(username, password string) (*http.Client, error) {
 
 	// 准备POST请求数据
 	data := url.Values{}
-	data.Set("username", username) // 请根据需求修改为实际的用户名
-	data.Set("password", password) // 请根据需求修改为实际的密码
+	data.Set("username", username)
+	data.Set("password", password)
 	data.Set("lt", lt)
 	data.Set("execution", execution)
 	data.Set("_eventId", eventID)
@@ -96,6 +96,8 @@ func Login(username, password string) (*http.Client, error) {
 	defer respPost.Body.Close()
 
 	bodyPost, _ := ioutil.ReadAll(respPost.Body)
+
+	fmt.Println(string(bodyPost))
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(bodyPost)))
 	if err != nil {
 		log.Fatal(err)
@@ -105,6 +107,5 @@ func Login(username, password string) (*http.Client, error) {
 	if msg == "您输入的用户名或密码有误。" {
 		return client, fmt.Errorf("%s", "您输入的用户名或密码有误")
 	}
-
-	return client, err
+	return client, nil
 }

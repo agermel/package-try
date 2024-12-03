@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"get_seat/tools" // 假设工具包放在 get_seat/tools 目录下
+	"get_seat/tools"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -36,7 +36,11 @@ func main() {
 			logOutput := fmt.Sprintf("登录失败: %v", err)
 			log.Println(logOutput)
 			// 显示错误信息并清空输入框
-			errorLabel.SetText("登录失败: 您输入的用户名或密码有误")
+			if err.Error() == "Post \"/clientweb/xcus/ic2/Login.aspx?sys=person\": stopped after 10 redirects" {
+				errorLabel.SetText("ohno网站崩了")
+			} else {
+				errorLabel.SetText(err.Error())
+			}
 			usernameEntry.SetText("") // 清空用户名
 			passwordEntry.SetText("") // 清空密码
 			return

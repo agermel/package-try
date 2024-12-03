@@ -22,7 +22,7 @@ type User struct {
 	Grade     string
 }
 
-var maxConcurrentRequests = 20 // 限制最大并发请求数
+var maxConcurrentRequests = 20 // 最大并发请求数
 var wg sync.WaitGroup
 var mutex sync.Mutex
 
@@ -77,8 +77,8 @@ func main() {
 
 	// 准备POST请求数据
 	data := url.Values{}
-	data.Set("username", "2024214744")  // 请根据需求修改为实际的用户名
-	data.Set("password", "WEEdru1351.") // 请根据需求修改为实际的密码
+	data.Set("username", "2024214744")
+	data.Set("password", "WEEdru1351.")
 	data.Set("lt", lt)
 	data.Set("execution", execution)
 	data.Set("_eventId", eventID)
@@ -140,7 +140,7 @@ func main() {
 			for _, studentId := range batchIds {
 				// 构建 GET 请求，替换学生学号参数
 				searchURL := "http://kjyy.ccnu.edu.cn/ClientWeb/pro/ajax/data/searchAccount.aspx"
-				params := "?type=logonname&ReservaApply=ReservaApply&term=" + studentId + "&_=" + fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+				params := "?type=logonname&ReservaApply=ReservaApply&term=" + studentId + "&_=" + fmt.Sprintf("%d", time.Now().UnixMilli())
 
 				// 发起GET请求搜索
 				reqSearch, err := http.NewRequest("GET", searchURL+params, nil)

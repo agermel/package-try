@@ -79,7 +79,7 @@ func format_time(startTime_Uncoded, overTime_Uncoded string) (formattedtime Form
 	// 获取今天的星期几
 	weekday := currentTime.Weekday()
 
-	// 默认开放时间：周一到周四，和周六到周日为 08:00 - 22:00
+	// 开放时间：周一到周四，和周六到周日为 08:00 - 22:00
 	openStart := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 8, 0, 0, 0, currentTime.Location()) // 08:00
 	openEnd := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 22, 0, 0, 0, currentTime.Location())  // 22:00
 
@@ -140,9 +140,14 @@ func get_info(client *http.Client, startTime_Uncoded, overTime_Uncoded string, i
 	var reserve_need Reserve_need
 	reserve_need.client = client
 
+	// real_url http://kjyy.ccnu.edu.cn/ClientWeb/pro/ajax/device.aspx?byType=devcls&classkind=8&display=fp&md=d&room_id=101699187&purpose=&selectOpenAty=&cld_name=default&date=2024-11-26&fr_start=14%3A50&fr_end=17%3A50&act=get_rsv_sta&_=1732603671177
 	sitUrl := "http://kjyy.ccnu.edu.cn/ClientWeb/pro/ajax/device.aspx"
 
 	room_id := []string{"101699187", "101699179", "101699189", "101699191"}
+	//room_id := "101699187" //南湖分馆一楼中庭开敞座位区     // N1001 ~ N1172 devID:101699605~101699776
+	//room_id := "101699179" //南湖分馆一楼开敞座位区         // N1173 ~ N1328 devID:101699777~101699932
+	//room_id := "101699189" //南湖分馆二楼开敞座位区		  // N2001 ~ N2148 devID:101699933~101700080
+	//room_id := "101699191" //南湖分馆二楼卡座区		      // K2001 ~ K2096 devID:101700081~101700176
 
 	// 格式化时间
 	formattedtime, err := format_time(startTime_Uncoded, overTime_Uncoded)
@@ -153,7 +158,7 @@ func get_info(client *http.Client, startTime_Uncoded, overTime_Uncoded string, i
 	// 构建查询参数
 	params := "?byType=devcls&classkind=8&display=fp&md=d&room_id=" + room_id[i] + "&purpose=&selectOpenAty=&cld_name=default&date=" + formattedtime.formattedDate +
 		"&fr_start=" + formattedtime.startTime_coded_url + "&fr_end=" + formattedtime.overTime_coded_url + "&act=get_rsv_sta&_=" +
-		fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+		fmt.Sprintf("%d", time.Now().UnixMilli())
 
 	var devID string
 	// 查询请求
@@ -233,7 +238,7 @@ func All_rooms_reserve_find(client *http.Client, startTime_Uncoded, overTime_Unc
 
 func Search_reserve_history(client *http.Client) (rsvID, seat string, err error) {
 	urlHistory := "http://kjyy.ccnu.edu.cn/ClientWeb/pro/ajax/center.aspx"
-	paramsHistory := "?act=get_History_resv&strat=90&StatFlag=New&_=" + fmt.Sprintf("%d", time.Now().UnixNano()/int64(time.Millisecond))
+	paramsHistory := "?act=get_History_resv&strat=90&StatFlag=New&_=" + fmt.Sprintf("%d", time.Now().UnixMilli())
 
 	reqHistory, err := http.NewRequest("GET", urlHistory+paramsHistory, nil)
 	if err != nil {
