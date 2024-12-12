@@ -1,0 +1,94 @@
+package main
+
+import (
+	"log"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+var DB *gorm.DB
+
+type Book struct {
+	ID     string `json:"id" binding:"required"`     // 主键必填
+	ISBN   string `json:"ISBN" binding:"required"`   // ISBN 必填
+	Title  string `json:"title" binding:"required"`  // 标题必填
+	Author string `json:"author" binding:"required"` // 作者必填
+}
+
+func initDB() {
+	var err error
+	dsn := "root:WEEdru1351.@tcp(123.56.118.201:3306)/library?charset=utf8mb4&parseTime=True&loc=Local"
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal("连接数据库失败:", err)
+	}
+
+	err = DB.AutoMigrate(&Book{})
+	if err != nil {
+		log.Fatal("数据库迁移失败:", err)
+	}
+}
+
+func addBook(c *gin.Context) {
+	var book Book
+
+	// 尝试绑定 JSON 数据并捕获校验错误
+	if err := c.ShouldBindJSON(&book); err != nil {
+		// 检查缺少的字段
+		errFields := []string{}
+		errMsg := err.Error()
+		if strings.Contains(errMsg, "Key: 'Book.ID'") {
+			errFields = append(errFields, "ID")
+		}
+		if strings.Contains(errMsg, "Key: 'Book.ISBN'") {
+			errFields = append(errFields, "ISBN")
+		}
+		if strings.Contains(errMsg, "Key: 'Book.Title'") {
+			errFields = append(errFields, "Title")
+		}
+		if strings.Contains(errMsg, "Key: 'Book.Author'") {
+			errFields = append(errFields, "Author")
+		}
+
+		c.JSON(400, gin.H{
+			"error":   "字段校验失败",
+			"missing": errFields,
+		})
+		return
+	}
+
+	// 检查字段是否为空（防止绕过）
+	if book.ID == " " || book.ISBN == " " || book.Title == " " || book.Author == " " {
+		c.JSON(400, gin.H{"error": "字段不能为空: ID, ISBN, Title, Author 均为必填项"})
+		return
+	}
+
+	// 插入数据
+	result := DB.Create(&book)
+	if result.Error != nil {
+		// 检查是否是主键重复错误
+		if strings.Contains(result.Error.Error(), "Duplicate entry") {
+			c.JSON(400, gin.H{"error": "主键重复，无法插入"})
+		} else {
+			c.JSON(500, gin.H{"error": "数据库操作失败: " + result.Error.Error()})
+		}
+		return
+	}
+
+	c.JSON(201, gin.H{"message": "书籍添加成功", "book": book})
+}
+
+func main() {
+	initDB()
+
+	r := gin.Default()
+
+	r.POST("/addBook", addBook)
+
+	if err := r.Run(":8080"); err != nil {
+		log.Fatal("启动服务器失败:", err)
+	}
+}

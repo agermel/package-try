@@ -1,0 +1,43 @@
+package main
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+// Book represents a book in the library
+type Book struct {
+	ID     string `json:"id"`
+	ISBN   string `json:"ISBN"`
+	Title  string `json:"title"`
+	Author string `json:"author"`
+}
+
+func main() {
+	r := gin.Default()
+
+	// Initialize the database
+	dsn := "root:WEEdru1351.@tcp(localhost:3306)/library?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect to the database")
+	}
+
+	// AutoMigrate the database structure
+	db.AutoMigrate(&Book{})
+
+	// GET method to retrieve all books
+	r.GET("/getBooks", func(c *gin.Context) {
+		var books []Book
+		if result := db.Find(&books); result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch books"})
+			return
+		}
+		c.JSON(http.StatusOK, books)
+	})
+
+	r.Run(":9090") // Start the server on port 8080
+}
